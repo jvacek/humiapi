@@ -17,7 +17,7 @@ from threading import Thread
 import requests
 
 # Import the calculation function directly
-from main import calculate_absolute_humidity
+from app.psychro_calculations import calculate_absolute_humidity
 
 
 def direct_calculation_examples():
@@ -38,9 +38,7 @@ def direct_calculation_examples():
 
     for temp, humidity, description in examples:
         result = calculate_absolute_humidity(temp, humidity)
-        print(
-            f"{description:.<30} {temp:>6.1f}°C, {humidity:>3d}% RH → {result:>6.2f} g/m³"
-        )
+        print(f"{description:.<30} {temp:>6.1f}°C, {humidity:>3d}% RH → {result:>6.2f} g/m³")
 
     print()
 
@@ -71,9 +69,7 @@ def api_request_examples():
         print(f"Health check: {response.json()}")
     except Exception as e:
         print(f"Could not connect to server: {e}")
-        print(
-            "Note: Run 'uv run python main.py' in another terminal to test API requests"
-        )
+        print("Note: Run 'uv run python main.py' in another terminal to test API requests")
         return
 
     # Test calculation endpoint
@@ -212,7 +208,7 @@ def main():
     print("   See the curl examples above")
     print()
     print("5. Import the function directly:")
-    print("   from main import calculate_absolute_humidity")
+    print("   from app.psychro_calculations import calculate_absolute_humidity")
     print("   result = calculate_absolute_humidity(25.0, 60)")
 
 

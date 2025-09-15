@@ -8,8 +8,11 @@ dependencies = [
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
     "jinja2>=3.1.0",
-    "python-multipart>=0.0.6"
+    "python-multipart>=0.0.6",
+    "psychrolib>=2.5.0",
+    "httpx>=0.28.1",
 ]
+
 
 [project.optional-dependencies]
 dev = [
@@ -20,5 +23,24 @@ dev = [
 
 [dependency-groups]
 dev = [
+    "pyright>=1.1.405",
+    "pytest>=8.4.2",
+    "requests>=2.32.5",
     "ruff>=0.13.0",
+]
+
+[tool.ruff]
+line-length=120
+
+[tool.pytest.ini_options]
+testpaths = "."
+addopts = "-v --tb=short --strict-markers --disable-warnings"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
 ]

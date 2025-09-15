@@ -136,8 +136,7 @@ class TestCalculationEndpoint:
         min_expected, max_expected = expected_range
 
         assert min_expected <= abs_humidity <= max_expected, (
-            f"Expected {min_expected}-{max_expected}, got {abs_humidity} "
-            f"for {temp}°C, {humidity}% RH"
+            f"Expected {min_expected}-{max_expected}, got {abs_humidity} for {temp}°C, {humidity}% RH"
         )
 
     def test_decimal_temperature(self, client):

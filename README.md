@@ -1,6 +1,6 @@
 # Absolute Humidity Calculator
 
-A modern FastAPI web application that calculates absolute humidity from temperature and relative humidity inputs, featuring a beautiful Jinja2-templated web interface and comprehensive REST API.
+A modern FastAPI web application that calculates absolute humidity from temperature and relative humidity inputs using PsychroLib, featuring a beautiful Jinja2-templated web interface and comprehensive REST API.
 
 ## Features
 
@@ -12,6 +12,7 @@ A modern FastAPI web application that calculates absolute humidity from temperat
 - **Interactive API documentation** (Swagger UI and ReDoc)
 - **Health check endpoints**
 - **Type hints** and modern Python practices
+- **PsychroLib integration** for accurate psychrometric calculations based on ASHRAE standards
 
 ## Installation
 
@@ -99,20 +100,23 @@ curl -X POST http://localhost:8000/api/calculate \
 - **Temperature**: Float value in Celsius (e.g., 25.5)
 - **Humidity**: Integer value representing relative humidity percentage (0-100)
 
-## Formula
+## Calculation Method
 
-The application uses the Magnus formula to calculate saturation vapor pressure and then determines absolute humidity using the ideal gas law:
+The application uses PsychroLib to calculate absolute humidity and other psychrometric properties:
 
-1. **Saturation vapor pressure**: `es = 6.112 * exp((17.67 * T) / (T + 243.5))`
-2. **Actual vapor pressure**: `e = (RH/100) * es`
-3. **Absolute humidity**: `AH = (e * 18.016) / (8314.5 * (T + 273.15)) * 1000`
+1. **PsychroLib**: Industry-standard psychrometric library implementing ASHRAE Handbook of Fundamentals formulas
+2. **Unit System**: SI (metric) units are used throughout the application
+3. **Calculation Process**:
+   - Validate temperature and humidity inputs
+   - Use PsychroLib to calculate humidity ratio
+   - Convert to absolute humidity (g/m³)
 
-Where:
-- T = temperature in Celsius
-- RH = relative humidity in percent
-- es = saturation vapor pressure in hPa
-- e = actual vapor pressure in hPa
-- AH = absolute humidity in g/m³
+PsychroLib provides accurate calculations for various psychrometric properties including:
+- Absolute humidity
+- Dew point temperature
+- Wet bulb temperature
+- Enthalpy
+- Vapor pressure
 
 ## Error Handling
 
@@ -130,11 +134,16 @@ The API returns appropriate HTTP status codes and error messages for:
 ```
 abs_humidity_calc/
 ├── main.py                 # FastAPI application
+├── app/
+│   ├── psychro_calculations.py # PsychroLib-based calculations
+│   └── calculations.py    # Legacy calculations (replaced by PsychroLib)
 ├── templates/
 │   └── index.html         # Jinja2 template for web interface
 ├── test_calculations.py   # Unit tests for calculations
 ├── test_api.py           # Integration tests for API
 ├── example_usage.py      # Usage examples
+├── psychrolib_example.py # PsychroLib examples
+├── PSYCHROLIB_INTEGRATION.md # Integration guide
 ├── pytest.ini           # Pytest configuration
 ├── pyproject.toml        # Project dependencies
 └── README.md            # This file
@@ -230,7 +239,7 @@ For production deployment:
 ### Quick Start Example
 
 ```python
-from main import calculate_absolute_humidity
+from app.psychro_calculations import calculate_absolute_humidity
 
 # Calculate absolute humidity
 result = calculate_absolute_humidity(25.0, 60)

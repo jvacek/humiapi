@@ -1,178 +1,93 @@
-import math
-from pathlib import Path
+"""
+Absolute Humidity Calculator - FastAPI Application
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse
+A modern web application for calculating absolute humidity from temperature
+and relative humidity inputs. This is the main entry point that creates
+and configures the FastAPI application.
+
+Usage:
+    python main.py              # Run with default settings
+    uvicorn main:app --reload   # Run with uvicorn directly
+"""
+
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
+
+from app import config
+from app.routes import api_router, web_router
 
 
-def calculate_absolute_humidity(
-    temperature_celsius: float, relative_humidity_percent: int
-) -> float:
+def create_app() -> FastAPI:
     """
-    Calculate absolute humidity given temperature and relative humidity.
-
-    Args:
-        temperature_celsius (float): Temperature in Celsius
-        relative_humidity_percent (int): Relative humidity as percentage (0-100)
+    Create and configure the FastAPI application.
 
     Returns:
-        float: Absolute humidity in g/m³
+        FastAPI: Configured FastAPI application instance
     """
-    # Convert relative humidity from percentage to decimal
-    rh = relative_humidity_percent / 100.0
+    # Initialize FastAPI with configuration
+    app = FastAPI(**config.get_fastapi_config())
 
-    # Calculate saturation vapor pressure using Magnus formula
-    # es = 6.112 * exp((17.67 * T) / (T + 243.5))
-    # where T is temperature in Celsius and es is in hPa
-    saturation_vapor_pressure = 6.112 * math.exp(
-        (17.67 * temperature_celsius) / (temperature_celsius + 243.5)
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.ALLOW_ORIGINS,
+        allow_credentials=True,
+        allow_methods=config.ALLOW_METHODS,
+        allow_headers=config.ALLOW_HEADERS,
     )
 
-    # Calculate actual vapor pressure
-    actual_vapor_pressure = rh * saturation_vapor_pressure
+    # Mount static files if directory exists
+    if config.STATIC_DIR.exists():
+        app.mount("/static", StaticFiles(directory=str(config.STATIC_DIR)), name="static")
 
-    # Convert to absolute humidity using the ideal gas law
-    # Formula: AH = (e * Mw) / (R * T)
-    # where:
-    # e = actual vapor pressure in Pa (convert from hPa by * 100)
-    # Mw = molecular weight of water = 18.016 g/mol
-    # R = specific gas constant for water vapor = 461.5 J/(kg·K)
-    # T = temperature in Kelvin
-    # Result is in kg/m³, multiply by 1000 to get g/m³
+    # Include routers
+    app.include_router(web_router)
+    app.include_router(api_router)
 
-    actual_vapor_pressure_pa = actual_vapor_pressure * 100  # Convert hPa to Pa
-    temperature_kelvin = temperature_celsius + 273.15
+    # Add startup event
+    @app.on_event("startup")
+    async def startup_event():
+        """Application startup event handler."""
+        print(f"🌡️  {config.APP_NAME} v{config.APP_VERSION}")
+        print(f"🚀 Server starting on http://{config.HOST}:{config.PORT}")
+        print(f"📖 API docs available at http://{config.HOST}:{config.PORT}{config.DOCS_URL}")
+        print(f"📋 Alternative docs at http://{config.HOST}:{config.PORT}{config.REDOC_URL}")
 
-    # AH in kg/m³
-    absolute_humidity_kg = (actual_vapor_pressure_pa * 18.016) / (
-        8314.5 * temperature_kelvin
-    )
+    # Add shutdown event
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        """Application shutdown event handler."""
+        print("🛑 Server shutting down...")
 
-    # Convert to g/m³
-    absolute_humidity = absolute_humidity_kg * 1000
+    # Add exception handlers
+    @app.exception_handler(ValueError)
+    async def value_error_handler(request: Request, exc: ValueError):
+        """Handle ValueError exceptions with appropriate HTTP responses."""
+        return JSONResponse(status_code=400, content={"error": f"Invalid input: {str(exc)}"})
 
-    return round(absolute_humidity, 2)
-
-
-# Pydantic models for request/response
-class HumidityCalculationRequest(BaseModel):
-    temperature: float = Field(..., description="Temperature in Celsius")
-    humidity: int = Field(
-        ..., ge=0, le=100, description="Relative humidity percentage (0-100)"
-    )
-
-
-class HumidityCalculationResponse(BaseModel):
-    absolute_humidity: float = Field(..., description="Absolute humidity in g/m³")
-    temperature: float = Field(..., description="Input temperature in Celsius")
-    humidity: int = Field(..., description="Input relative humidity percentage")
-    unit: str = Field(default="g/m³", description="Unit of measurement")
-
-
-class HealthResponse(BaseModel):
-    status: str = Field(default="healthy", description="Health status")
-
-
-class ErrorResponse(BaseModel):
-    error: str = Field(..., description="Error message")
-
-
-# Create FastAPI app
-app = FastAPI(
-    title="Absolute Humidity Calculator",
-    description="A FastAPI application that calculates absolute humidity from temperature and relative humidity",
-    version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
-)
-
-# Set up templates
-templates_dir = Path(__file__).parent / "templates"
-templates = Jinja2Templates(directory=str(templates_dir))
-
-# Set up static files (if needed in the future)
-static_dir = Path(__file__).parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
-
-@app.get("/", response_class=HTMLResponse, summary="Web Interface")
-async def index(request: Request):
-    """Serve the main web interface using Jinja2 template."""
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "title": "Absolute Humidity Calculator",
-            "api_base_url": "/api",
-        },
-    )
-
-
-@app.post(
-    "/api/calculate",
-    response_model=HumidityCalculationResponse,
-    responses={
-        400: {"model": ErrorResponse, "description": "Bad Request"},
-        422: {"model": ErrorResponse, "description": "Validation Error"},
-    },
-    summary="Calculate Absolute Humidity",
-    description="Calculate absolute humidity given temperature in Celsius and relative humidity percentage",
-)
-async def calculate(request: HumidityCalculationRequest):
-    """API endpoint to calculate absolute humidity."""
-    try:
-        # Calculate absolute humidity
-        abs_humidity = calculate_absolute_humidity(
-            request.temperature, request.humidity
+    @app.exception_handler(ZeroDivisionError)
+    async def zero_division_error_handler(request: Request, exc: ZeroDivisionError):
+        """Handle ZeroDivisionError exceptions."""
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Temperature too low for calculation (division by zero)"},
         )
 
-        return HumidityCalculationResponse(
-            absolute_humidity=abs_humidity,
-            temperature=request.temperature,
-            humidity=request.humidity,
-            unit="g/m³",
-        )
+    @app.exception_handler(Exception)
+    async def general_exception_handler(request: Request, exc: Exception):
+        """Handle general exceptions."""
+        return JSONResponse(status_code=500, content={"error": f"Internal server error: {str(exc)}"})
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
+    return app
 
 
-@app.get(
-    "/api/health",
-    response_model=HealthResponse,
-    summary="Health Check",
-    description="Check if the API is running properly",
-)
-async def health():
-    """Health check endpoint."""
-    return HealthResponse(status="healthy")
-
-
-@app.get(
-    "/health",
-    response_model=HealthResponse,
-    summary="Health Check (Alternative)",
-    description="Alternative health check endpoint for compatibility",
-)
-async def health_alt():
-    """Alternative health check endpoint for compatibility."""
-    return HealthResponse(status="healthy")
-
-
-# Error handlers
-@app.exception_handler(422)
-async def validation_exception_handler(request: Request, exc):
-    """Handle validation errors with custom response."""
-    return {
-        "error": "Invalid input parameters. Please check your temperature and humidity values."
-    }
+# Create the application instance
+app = create_app()
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True, log_level="info")
+    # Run the server when script is executed directly
+    uvicorn.run("main:app", **config.get_uvicorn_config())
