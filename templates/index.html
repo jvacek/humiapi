@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title | default("Absolute Humidity Calculator") }}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 1rem;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #fafafa;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            background: white;
+        }
+
+        .input-hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            background: #f8f9fa;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .result-container.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .result-container.error .result-value {
+            color: #f44336;
+            font-size: 1.2rem;
+        }
+
+        .result-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        .info-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-section h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .info-section p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .example-values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .example-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .example-card:hover {
+            transform: translateY(-2px);
+            border-color: #4CAF50;
+        }
+
+        .example-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .example-inputs {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 10px;
+                border-radius: 8px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .example-values {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ title | default("Absolute Humidity Calculator") }}</h1>
+            <p>Calculate absolute humidity from temperature and relative humidity</p>
+        </div>
+
+        <div class="main-content">
+            <form id="humidityForm">
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input
+                        type="number"
+                        id="temperature"
+                        name="temperature"
+                        step="0.1"
+                        required
+                        placeholder="e.g., 25.5"
+                        aria-describedby="temp-hint"
+                    >
+                    <div class="input-hint" id="temp-hint">Enter temperature in Celsius (decimal values allowed)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="humidity">Relative Humidity (%)</label>
+                    <input
+                        type="number"
+                        id="humidity"
+                        name="humidity"
+                        min="0"
+                        max="100"
+                        required
+                        placeholder="e.g., 60"
+                        aria-describedby="humidity-hint"
+                    >
+                    <div class="input-hint" id="humidity-hint">Enter relative humidity as percentage (0-100)</div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="calculateBtn">
+                    Calculate Absolute Humidity
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                Calculating...
+            </div>
+
+            <div id="result" class="result-container"></div>
+
+            <div class="info-section">
+                <h3>Quick Examples</h3>
+                <p>Click on any example below to try it:</p>
+                <div class="example-values">
+                    <div class="example-card" onclick="setValues(20, 50)">
+                        <div class="example-title">Room Comfort</div>
+                        <div class="example-inputs">20°C, 50% RH</div>
+                    </div>
+                    <div class="example-card" onclick="setValues(25, 60)">
+                        <div class="example-title">Mild Weather</div>
+                        <div class="example-inputs">25°C, 60% RH</div>
+                    </div>
+                    <div class="example-card" onclick="setValues(30, 80)">
+                        <div class="example-title">Tropical</div>
+                        <div class="example-inputs">30°C, 80% RH</div>
+                    </div>
+                    <div class="example-card" onclick="setValues(0, 30)">
+                        <div class="example-title">Cold & Dry</div>
+                        <div class="example-inputs">0°C, 30% RH</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>About Absolute Humidity</h3>
+                <p>Absolute humidity is the mass of water vapor per unit volume of air, typically expressed in grams per cubic meter (g/m³).</p>
+                <p>Unlike relative humidity, absolute humidity doesn't change with temperature - it's an absolute measure of water content in the air.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('humidityForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const calculateBtn = document.getElementById('calculateBtn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const humidity = parseInt(document.getElementById('humidity').value);
+
+            // Show loading state
+            loading.classList.add('show');
+            result.classList.remove('show');
+            calculateBtn.disabled = true;
+            calculateBtn.textContent = 'Calculating...';
+
+            try {
+                const response = await fetch('{{ api_base_url | default("/api") }}/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        temperature: temperature,
+                        humidity: humidity
+                    })
+                });
+
+                const data = await response.json();
+
+                // Hide loading
+                loading.classList.remove('show');
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = 'Calculate Absolute Humidity';
+
+                if (response.ok) {
+                    result.innerHTML = `
+                        <div class="result-value">${data.absolute_humidity} ${data.unit}</div>
+                        <div class="result-details">
+                            <strong>Input:</strong> ${data.temperature}°C, ${data.humidity}% RH<br>
+                            <strong>Result:</strong> ${data.absolute_humidity} grams of water vapor per cubic meter of air
+                        </div>
+                    `;
+                    result.className = 'result-container show';
+                } else {
+                    result.innerHTML = `
+                        <div class="result-value">Error</div>
+                        <div class="result-details">${data.error}</div>
+                    `;
+                    result.className = 'result-container error show';
+                }
+            } catch (error) {
+                // Hide loading
+                loading.classList.remove('show');
+                calculateBtn.disabled = false;
+                calculateBtn.textContent = 'Calculate Absolute Humidity';
+
+                result.innerHTML = `
+                    <div class="result-value">Error</div>
+                    <div class="result-details">Failed to connect to the server. Please try again.</div>
+                `;
+                result.className = 'result-container error show';
+            }
+        });
+
+        function setValues(temp, humidity) {
+            document.getElementById('temperature').value = temp;
+            document.getElementById('humidity').value = humidity;
+
+            // Add visual feedback
+            const tempInput = document.getElementById('temperature');
+            const humidityInput = document.getElementById('humidity');
+
+            tempInput.style.backgroundColor = '#e8f5e8';
+            humidityInput.style.backgroundColor = '#e8f5e8';
+
+            setTimeout(() => {
+                tempInput.style.backgroundColor = '';
+                humidityInput.style.backgroundColor = '';
+            }, 500);
+        }
+
+        // Add input validation feedback
+        document.getElementById('humidity').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0 || value > 100) {
+                this.style.borderColor = '#f44336';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+            }
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                form.dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
