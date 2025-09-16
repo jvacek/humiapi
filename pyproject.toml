@@ -21,6 +21,10 @@ dev = [
     "ruff>=0.13.0",
 ]
 
+[tool.uv]
+compile-bytecode = true
+
+
 [tool.ruff]
 line-length=120
 
