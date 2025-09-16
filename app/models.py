@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class HumidityCalculationRequest(BaseModel):
     """Request model for humidity calculation."""
 
-    temperature: float = Field(..., description="Temperature in Celsius")
+    temperature: float = Field(..., ge=-273.15, le=10000, description="Temperature in Celsius")
     humidity: int = Field(..., ge=0, le=100, description="Relative humidity percentage (0-100)")
 
 

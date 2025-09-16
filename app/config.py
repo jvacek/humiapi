@@ -40,14 +40,6 @@ class Config:
     # Template settings
     TEMPLATE_AUTO_RELOAD = True
 
-    # Calculation constants - not needed as we use PsychroLib
-
-    # Validation limits
-    MIN_TEMPERATURE = -273.15  # Absolute zero in Celsius
-    MAX_TEMPERATURE = 1000.0  # Maximum reasonable temperature for calculation
-    MIN_HUMIDITY = 0  # Minimum relative humidity percentage
-    MAX_HUMIDITY = 100  # Maximum relative humidity percentage
-
     # Response formatting
     DECIMAL_PLACES = 2
     DEFAULT_UNIT = "g/m³"
