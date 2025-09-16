@@ -1,8 +1,8 @@
 """
 Configuration settings for the Absolute Humidity Calculator application.
 
-This module contains all configuration constants and settings used throughout
-the application, including server settings, API metadata, and template configuration.
+This module contains essential configuration constants and settings used
+throughout the application.
 """
 
 from pathlib import Path
@@ -40,12 +40,7 @@ class Config:
     # Template settings
     TEMPLATE_AUTO_RELOAD = True
 
-    # Calculation constants
-    WATER_MOLECULAR_WEIGHT = 18.016  # g/mol
-    UNIVERSAL_GAS_CONSTANT = 8314.5  # J/(kmol·K)
-    MAGNUS_A = 17.67
-    MAGNUS_B = 243.5
-    MAGNUS_C = 6.112
+    # Calculation constants - not needed as we use PsychroLib
 
     # Validation limits
     MIN_TEMPERATURE = -273.15  # Absolute zero in Celsius

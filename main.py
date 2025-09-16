@@ -1,7 +1,7 @@
 """
 Absolute Humidity Calculator - FastAPI Application
 
-A modern web application for calculating absolute humidity from temperature
+A simple web application for calculating absolute humidity from temperature
 and relative humidity inputs. This is the main entry point that creates
 and configures the FastAPI application.
 

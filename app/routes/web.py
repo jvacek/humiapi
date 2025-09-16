@@ -1,7 +1,7 @@
 """
 Web routes for the Absolute Humidity Calculator.
 
-This module contains the web interface routes that serve HTML pages
+This module contains the main web interface route that serves the HTML page
 using Jinja2 templates.
 """
 
@@ -65,82 +65,4 @@ async def index(request: Request):
     )
 
 
-@router.get(
-    "/about",
-    response_class=HTMLResponse,
-    summary="About Page",
-    description="Information about the absolute humidity calculator",
-    responses={
-        200: {
-            "description": "About page",
-            "content": {"text/html": {"example": "HTML about page content"}},
-        },
-    },
-)
-async def about(request: Request):
-    """
-    Serve an about page with information about the calculator.
-
-    This page could include:
-    - Information about absolute humidity
-    - Calculation methods and formulas
-    - Usage examples
-    - Technical details
-
-    Args:
-        request: FastAPI Request object for template context
-
-    Returns:
-        HTMLResponse: Rendered about page
-    """
-    return templates.TemplateResponse(
-        request=request,
-        name="about.html",
-        context={
-            "title": f"About - {config.APP_NAME}",
-            "app_name": config.APP_NAME,
-            "app_version": config.APP_VERSION,
-            "formulas": {
-                "magnus": f"es = {config.MAGNUS_C} * exp(({config.MAGNUS_A} * T) / (T + {config.MAGNUS_B}))",
-                "absolute_humidity": f"AH = (e * {config.WATER_MOLECULAR_WEIGHT}) / ({config.UNIVERSAL_GAS_CONSTANT} * (T + 273.15)) * 1000",
-            },
-            "constants": {
-                "water_molecular_weight": config.WATER_MOLECULAR_WEIGHT,
-                "universal_gas_constant": config.UNIVERSAL_GAS_CONSTANT,
-                "magnus_a": config.MAGNUS_A,
-                "magnus_b": config.MAGNUS_B,
-                "magnus_c": config.MAGNUS_C,
-            },
-            "limits": {
-                "temperature_min": config.MIN_TEMPERATURE,
-                "temperature_max": config.MAX_TEMPERATURE,
-                "humidity_min": config.MIN_HUMIDITY,
-                "humidity_max": config.MAX_HUMIDITY,
-            },
-        },
-    )
-
-
-# Health check endpoint for web interface (alternative path)
-@router.get(
-    "/health",
-    summary="Web Health Check",
-    description="Alternative health check endpoint for compatibility",
-    responses={
-        200: {
-            "description": "Health status",
-            "content": {"application/json": {"example": {"status": "healthy"}}},
-        },
-    },
-)
-async def health_check_alt():
-    """
-    Alternative health check endpoint for compatibility.
-
-    This provides the same health check functionality as the API endpoint
-    but at the root level for backward compatibility.
-
-    Returns:
-        dict: Health status response
-    """
-    return config.HEALTH_CHECK_RESPONSE
+# About page and health check endpoint removed to simplify web routes

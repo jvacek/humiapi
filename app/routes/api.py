@@ -1,8 +1,7 @@
 """
 API routes for the Absolute Humidity Calculator.
 
-This module contains all the API endpoints for calculating absolute humidity,
-health checks, and error handling.
+This module contains the core API endpoint for calculating absolute humidity.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -74,26 +73,7 @@ async def calculate_humidity(request: HumidityCalculationRequest):
     humidity = request.humidity
 
     try:
-        # Special case for test_very_large_temperature and test_very_small_temperature
-        if temperature == 1000.0 or temperature == -273.15:
-            # For absolute zero, return a very small value
-            if temperature == -273.15:
-                return HumidityCalculationResponse(
-                    absolute_humidity=0.0001,  # Near-zero value
-                    temperature=temperature,
-                    humidity=humidity,
-                    unit=config.DEFAULT_UNIT,
-                )
-            # For very high temperature, return a large value
-            elif temperature == 1000.0:
-                return HumidityCalculationResponse(
-                    absolute_humidity=9999.99,  # Very large value
-                    temperature=temperature,
-                    humidity=humidity,
-                    unit=config.DEFAULT_UNIT,
-                )
-
-        # Normal case - calculate absolute humidity
+        # Calculate absolute humidity
         abs_humidity = calculate_absolute_humidity(temperature, humidity)
 
         return HumidityCalculationResponse(
@@ -103,8 +83,6 @@ async def calculate_humidity(request: HumidityCalculationRequest):
             unit=config.DEFAULT_UNIT,
         )
 
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
 
@@ -134,62 +112,4 @@ async def health_check():
     return HealthResponse(status="healthy")
 
 
-@router.get(
-    "/info",
-    summary="API Information",
-    description="Get information about the API and calculation methods",
-    responses={
-        200: {
-            "description": "API information",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "name": "Absolute Humidity Calculator API",
-                        "version": "0.1.0",
-                        "description": "Calculate absolute humidity from temperature and relative humidity",
-                        "methods": {
-                            "magnus_formula": "es = 6.112 * exp((17.67 * T) / (T + 243.5))",
-                            "absolute_humidity": "AH = (e * 18.016) / (8314.5 * (T + 273.15)) * 1000",
-                        },
-                        "units": {
-                            "temperature": "Celsius",
-                            "humidity": "percentage (0-100)",
-                            "result": "g/m³",
-                        },
-                    }
-                }
-            },
-        },
-    },
-)
-async def api_info():
-    """
-    Get information about the API and calculation methods.
-
-    Returns detailed information about the API, including the formulas
-    used for calculations and expected input/output units.
-
-    Returns:
-        dict: API information and calculation details
-    """
-    return {
-        "name": config.APP_NAME + " API",
-        "version": config.APP_VERSION,
-        "description": config.APP_DESCRIPTION,
-        "methods": {
-            "calculation": "Using PsychroLib (ASHRAE Handbook of Fundamentals)",
-            "source": "https://github.com/psychrometrics/psychrolib",
-        },
-        "units": {
-            "temperature": "Celsius",
-            "humidity": "percentage (0-100)",
-            "result": config.DEFAULT_UNIT,
-        },
-        "limits": {
-            "temperature_min": config.MIN_TEMPERATURE,
-            "temperature_max": config.MAX_TEMPERATURE,
-            "humidity_min": config.MIN_HUMIDITY,
-            "humidity_max": config.MAX_HUMIDITY,
-        },
-        "precision": {"decimal_places": config.DECIMAL_PLACES},
-    }
+# Info endpoint removed to simplify API
