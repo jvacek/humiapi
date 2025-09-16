@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>
+            {% block title %}{{ title | default("Absolute Humidity Calculator")
+            }}{% endblock %}
+        </title>
+        <!-- Tailwind CSS via CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: {
+                                50: "#f0fdf4",
+                                100: "#dcfce7",
+                                200: "#bbf7d0",
+                                300: "#86efac",
+                                400: "#4ade80",
+                                500: "#22c55e",
+                                600: "#16a34a",
+                                700: "#15803d",
+                                800: "#166534",
+                                900: "#14532d",
+                                950: "#052e16",
+                            },
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .bg-gradient {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .bg-green-gradient {
+                background: linear-gradient(45deg, #16a34a, #15803d);
+            }
+
+            .slide-in {
+                animation: slideIn 0.3s ease-out;
+            }
+
+            /* Hide and show functionality */
+            .hidden-result {
+                display: none;
+            }
+
+            .show-result {
+                display: block;
+                animation: slideIn 0.3s ease-out;
+            }
+        </style>
+        {% block extra_css %}{% endblock %}
+    </head>
+    <body class="bg-gradient min-h-screen p-4">
+        <div class="container mx-auto max-w-4xl">
+            <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+                <div class="bg-green-gradient text-white p-8 text-center">
+                    <h1 class="text-3xl md:text-4xl font-light mb-2">
+                        {% block header %}{{ title | default("Absolute Humidity
+                        Calculator") }}{% endblock %}
+                    </h1>
+                    <p class="text-lg opacity-90">
+                        {% block subheader %}Calculate absolute humidity from
+                        temperature and relative humidity{% endblock %}
+                    </p>
+                </div>
+
+                {% block navigation %}
+                <nav class="bg-gray-50 border-b border-gray-200">
+                    <div class="container mx-auto px-6 py-3">
+                        <div class="flex space-x-6">
+                            <a
+                                href="/"
+                                class="text-primary-600 hover:text-primary-800 px-2 py-1 font-medium {% if active_page == 'home' %}border-b-2 border-primary-500{% endif %}"
+                                >Calculator</a
+                            >
+                            <a
+                                href="/about"
+                                class="text-primary-600 hover:text-primary-800 px-2 py-1 font-medium {% if active_page == 'about' %}border-b-2 border-primary-500{% endif %}"
+                                >About</a
+                            >
+                            <a
+                                href="/docs"
+                                class="text-primary-600 hover:text-primary-800 px-2 py-1 font-medium"
+                                >API Docs</a
+                            >
+                            <a
+                                href="/redoc"
+                                class="text-primary-600 hover:text-primary-800 px-2 py-1 font-medium"
+                                >Technical Docs</a
+                            >
+                        </div>
+                    </div>
+                </nav>
+                {% endblock %}
+
+                <div class="p-6 md:p-8">{% block content %}{% endblock %}</div>
+            </div>
+
+            <footer class="text-center text-white mt-4">
+                <small
+                    >{{ app_name | default("Absolute Humidity Calculator") }}
+                    v{{ app_version | default("0.1.0") }}</small
+                >
+            </footer>
+        </div>
+
+        {% block scripts %}{% endblock %}
+    </body>
+</html>
