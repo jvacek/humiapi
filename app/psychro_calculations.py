@@ -6,7 +6,6 @@ using the PsychroLib package, which implements the formulas from
 the ASHRAE Handbook of Fundamentals.
 """
 
-
 import psychrolib
 
 # Set unit system to SI (metric)
