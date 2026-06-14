@@ -1,4 +1,4 @@
-FROM astral/uv:0.8-python3.13-alpine
+FROM astral/uv:0.11-python3.13-alpine
 
 # Set environment variables
 ENV UV_LINK_MODE=copy
