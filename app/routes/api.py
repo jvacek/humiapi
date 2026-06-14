@@ -4,7 +4,7 @@ API routes for the Absolute Humidity Calculator.
 This module contains the core API endpoint for calculating absolute humidity.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 
 from ..config import config
 from ..models import (
@@ -55,36 +55,18 @@ async def calculate_humidity(request: HumidityCalculationRequest):
     """
     Calculate absolute humidity from temperature and relative humidity.
 
-    This endpoint performs the core calculation using PsychroLib's
-    psychrometric functions, which implement the ASHRAE Handbook of
-    Fundamentals formulas for accurate results.
-
-    Args:
-        request: HumidityCalculationRequest containing temperature and humidity
-
-    Returns:
-        HumidityCalculationResponse: Calculated absolute humidity with metadata
-
-    Raises:
-        HTTPException: 400 if input validation fails, 500 if calculation fails
+    Uses PsychroLib's psychrometric functions, which implement the ASHRAE
+    Handbook of Fundamentals formulas. A failed calculation raises ValueError,
+    which the app translates into a 400 response.
     """
-    # Handle extreme temperature values
-    temperature = request.temperature
-    humidity = request.humidity
+    abs_humidity = calculate_absolute_humidity(request.temperature, request.humidity)
 
-    try:
-        # Calculate absolute humidity
-        abs_humidity = calculate_absolute_humidity(temperature, humidity)
-
-        return HumidityCalculationResponse(
-            absolute_humidity=abs_humidity,
-            temperature=temperature,
-            humidity=humidity,
-            unit=config.DEFAULT_UNIT,
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Calculation error: {str(e)}")
+    return HumidityCalculationResponse(
+        absolute_humidity=abs_humidity,
+        temperature=request.temperature,
+        humidity=request.humidity,
+        unit=config.DEFAULT_UNIT,
+    )
 
 
 @router.get(
