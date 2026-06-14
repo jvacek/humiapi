@@ -26,8 +26,7 @@ def calculate_absolute_humidity(temperature_celsius: float, relative_humidity_pe
         float: Absolute humidity in g/m³, rounded to 2 decimal places
 
     Raises:
-        ValueError: If calculation fails
-        ZeroDivisionError: If temperature approaches absolute zero
+        ValueError: If the calculation fails
     """
     try:
         # Convert relative humidity from percentage to decimal
@@ -53,10 +52,7 @@ def calculate_absolute_humidity(temperature_celsius: float, relative_humidity_pe
 
         return round(absolute_humidity, 2)
 
-    except (ValueError, ZeroDivisionError) as e:
-        raise e
+    except ValueError:
+        raise
     except Exception as e:
-        raise ValueError(f"Calculation failed: {str(e)}")
-
-
-# Validation functions removed - we rely on Pydantic for input validation
+        raise ValueError(f"Calculation failed: {e}")
