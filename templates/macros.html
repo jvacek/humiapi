@@ -1,0 +1,31 @@
+{# Reusable UI fragments shared across templates. #}
+
+{% macro section_heading(text) %}
+<h2
+    class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
+>
+    {{ text }}
+</h2>
+{% endmacro %}
+
+{% macro numbered_step(number, title, body) %}
+<li class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary-500 relative pl-10">
+    <div
+        class="absolute left-3 top-3 bg-primary-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-bold"
+    >
+        {{ number }}
+    </div>
+    <div class="font-medium text-gray-800">{{ title }}</div>
+    <p class="text-gray-600 text-sm">{{ body }}</p>
+</li>
+{% endmacro %}
+
+{% macro example_card(name, detail, temp, humidity) %}
+<div
+    class="bg-white rounded-md shadow-sm border border-gray-200 p-4 text-center cursor-pointer hover:shadow-md hover:border-primary-500 hover:-translate-y-0.5 transition-all duration-150"
+    onclick="setValues({{ temp }}, {{ humidity }})"
+>
+    <div class="font-medium text-gray-800">{{ name }}</div>
+    <div class="text-sm text-gray-500">{{ detail }}</div>
+</div>
+{% endmacro %}

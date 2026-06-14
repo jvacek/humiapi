@@ -1,8 +1,6 @@
 {% extends "base.html" %}
-{% block title %}{{ title | default("Absolute Humidity Calculator") }}{% endblock %}
-{% block header %}{{ title | default("Absolute Humidity Calculator") }}{% endblock %}
-{% block subheader %}Calculate absolute humidity from temperature and relative humidity{% endblock %}
-    {% block content %}
+{% import "macros.html" as ui %}
+{% block content %}
 <div class="space-y-8">
     <form id="humidityForm" class="space-y-6">
         <div>
@@ -75,38 +73,16 @@
         <h3 class="text-lg font-semibold text-gray-800 mb-3">Quick Examples</h3>
         <p class="text-gray-600 mb-4">Click on any example below to try it:</p>
 
+        {% set examples = [
+            ("Room Comfort", "20°C, 50% RH", 20, 50),
+            ("Mild Weather", "25°C, 60% RH", 25, 60),
+            ("Tropical", "30°C, 80% RH", 30, 80),
+            ("Cold & Dry", "0°C, 30% RH", 0, 30),
+        ] %}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div
-                class="bg-white rounded-md shadow-sm border border-gray-200 p-4 text-center cursor-pointer hover:shadow-md hover:border-primary-500 hover:-translate-y-0.5 transition-all duration-150"
-                onclick="setValues(20, 50)"
-            >
-                <div class="font-medium text-gray-800">Room Comfort</div>
-                <div class="text-sm text-gray-500">20°C, 50% RH</div>
-            </div>
-
-            <div
-                class="bg-white rounded-md shadow-sm border border-gray-200 p-4 text-center cursor-pointer hover:shadow-md hover:border-primary-500 hover:-translate-y-0.5 transition-all duration-150"
-                onclick="setValues(25, 60)"
-            >
-                <div class="font-medium text-gray-800">Mild Weather</div>
-                <div class="text-sm text-gray-500">25°C, 60% RH</div>
-            </div>
-
-            <div
-                class="bg-white rounded-md shadow-sm border border-gray-200 p-4 text-center cursor-pointer hover:shadow-md hover:border-primary-500 hover:-translate-y-0.5 transition-all duration-150"
-                onclick="setValues(30, 80)"
-            >
-                <div class="font-medium text-gray-800">Tropical</div>
-                <div class="text-sm text-gray-500">30°C, 80% RH</div>
-            </div>
-
-            <div
-                class="bg-white rounded-md shadow-sm border border-gray-200 p-4 text-center cursor-pointer hover:shadow-md hover:border-primary-500 hover:-translate-y-0.5 transition-all duration-150"
-                onclick="setValues(0, 30)"
-            >
-                <div class="font-medium text-gray-800">Cold & Dry</div>
-                <div class="text-sm text-gray-500">0°C, 30% RH</div>
-            </div>
+            {% for name, detail, temp, humidity in examples %}
+            {{ ui.example_card(name, detail, temp, humidity) }}
+            {% endfor %}
         </div>
     </div>
 

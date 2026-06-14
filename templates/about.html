@@ -1,16 +1,12 @@
 {% extends "base.html" %} {% block title %}{{ title | default("About - Absolute
 Humidity Calculator") }}{% endblock %} {% block header %}About {{ app_name |
 default("Absolute Humidity Calculator") }}{% endblock %} {% block subheader
-%}Understanding the science behind humidity calculations{% endblock %} {% block
-content %}
+%}Understanding the science behind humidity calculations{% endblock %} {% import
+"macros.html" as ui %} {% block content %}
 <div class="space-y-10">
     <!-- What is Absolute Humidity -->
     <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            What is Absolute Humidity?
-        </h2>
+        {{ ui.section_heading("What is Absolute Humidity?") }}
         <p class="text-gray-700 mb-4">
             Absolute humidity is the mass of water vapor present in a unit
             volume of air, typically expressed in grams per cubic meter (g/m³).
@@ -38,11 +34,7 @@ content %}
 
     <!-- Calculation Method -->
     <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            Calculation Method
-        </h2>
+        {{ ui.section_heading("Calculation Method") }}
         <p class="text-gray-700 mb-4">
             This calculator uses
             <a
@@ -57,66 +49,21 @@ content %}
         <h3 class="text-lg font-medium text-gray-800 mt-6 mb-4">
             Step-by-Step Process:
         </h3>
+        {% set steps = [
+            ("Compute the Humidity Ratio", "From temperature, relative humidity, and pressure, PsychroLib derives the humidity ratio (mass of water vapor per mass of dry air)."),
+            ("Compute Moist Air Density", "PsychroLib calculates the density of the moist air at the given conditions."),
+            ("Derive Absolute Humidity", "Multiplying air density by the humidity ratio gives the mass of water vapor per cubic meter, reported in g/m³."),
+        ] %}
         <ol class="space-y-4 mb-6">
-            <li
-                class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary-500 relative pl-10"
-            >
-                <div
-                    class="absolute left-3 top-3 bg-primary-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-bold"
-                >
-                    1
-                </div>
-                <div class="font-medium text-gray-800">
-                    Compute the Humidity Ratio
-                </div>
-                <p class="text-gray-600 text-sm">
-                    From temperature, relative humidity, and pressure,
-                    PsychroLib derives the humidity ratio (mass of water vapor
-                    per mass of dry air).
-                </p>
-            </li>
-            <li
-                class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary-500 relative pl-10"
-            >
-                <div
-                    class="absolute left-3 top-3 bg-primary-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-bold"
-                >
-                    2
-                </div>
-                <div class="font-medium text-gray-800">
-                    Compute Moist Air Density
-                </div>
-                <p class="text-gray-600 text-sm">
-                    PsychroLib calculates the density of the moist air at the
-                    given conditions.
-                </p>
-            </li>
-            <li
-                class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary-500 relative pl-10"
-            >
-                <div
-                    class="absolute left-3 top-3 bg-primary-500 text-white w-6 h-6 rounded-full flex items-center justify-center font-bold"
-                >
-                    3
-                </div>
-                <div class="font-medium text-gray-800">
-                    Derive Absolute Humidity
-                </div>
-                <p class="text-gray-600 text-sm">
-                    Multiplying air density by the humidity ratio gives the mass
-                    of water vapor per cubic meter, reported in g/m³.
-                </p>
-            </li>
+            {% for title, body in steps %}
+            {{ ui.numbered_step(loop.index, title, body) }}
+            {% endfor %}
         </ol>
     </section>
 
     <!-- Input Limits and Validation -->
     <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            Input Limits and Validation
-        </h2>
+        {{ ui.section_heading("Input Limits and Validation") }}
         <p class="text-gray-700 mb-6">
             To ensure accurate calculations, the following limits are enforced:
         </p>
@@ -163,11 +110,7 @@ content %}
 
     <!-- Accuracy and Precision -->
     <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            Accuracy and Precision
-        </h2>
+        {{ ui.section_heading("Accuracy and Precision") }}
         <p class="text-gray-700 mb-4">
             Our calculator provides results with high accuracy suitable for most
             practical applications:
