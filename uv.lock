@@ -8,7 +8,6 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "jinja2" },
     { name = "psychrolib" },
     { name = "python-multipart" },
@@ -27,7 +26,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.104.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "psychrolib", specifier = ">=2.5.0" },
     { name = "python-multipart", specifier = ">=0.0.6" },

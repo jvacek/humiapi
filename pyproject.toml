@@ -1,7 +1,7 @@
 [project]
 name = "abs-humidity-calc"
 version = "0.1.0"
-description = "Add your description here"
+description = "A FastAPI web app that calculates absolute humidity from temperature and relative humidity."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -10,7 +10,6 @@ dependencies = [
     "jinja2>=3.1.0",
     "python-multipart>=0.0.6",
     "psychrolib>=2.5.0",
-    "httpx>=0.28.1",
 ]
 
 [dependency-groups]
