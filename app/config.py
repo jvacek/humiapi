@@ -11,7 +11,7 @@ class Config:
 
     # Application metadata
     APP_NAME = "Absolute Humidity Calculator"
-    APP_VERSION = "0.1.0"
+    APP_VERSION = "0.2.0"
     APP_DESCRIPTION = "Calculate absolute humidity from temperature and relative humidity."
 
     # Server settings

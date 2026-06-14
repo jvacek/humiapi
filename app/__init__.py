@@ -17,7 +17,7 @@ from .models import (
 )
 from .psychro_calculations import calculate_absolute_humidity
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "calculate_absolute_humidity",
