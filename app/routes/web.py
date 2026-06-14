@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 from ..config import config
 
 # Initialize Jinja2 templates
-templates = Jinja2Templates(**config.get_template_config())
+templates = Jinja2Templates(directory=str(config.TEMPLATES_DIR))
 
 # Create web router
 router = APIRouter(
@@ -37,22 +37,7 @@ router = APIRouter(
     },
 )
 async def index(request: Request):
-    """
-    Serve the main web interface using Jinja2 template.
-
-    This endpoint renders the main HTML page with a responsive form
-    for calculating absolute humidity. The page includes:
-    - Temperature input (Celsius)
-    - Humidity input (percentage)
-    - Interactive examples
-    - Real-time calculation via JavaScript
-
-    Args:
-        request: FastAPI Request object for template context
-
-    Returns:
-        HTMLResponse: Rendered HTML page
-    """
+    """Serve the main calculator web interface."""
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -79,22 +64,7 @@ async def index(request: Request):
     },
 )
 async def about(request: Request):
-    """
-    Serve the about page using Jinja2 template.
-
-    This endpoint renders the HTML page with detailed information about:
-    - What absolute humidity is
-    - The calculation methods and formulas
-    - Physical constants used
-    - Input limits and validation
-    - Technical implementation details
-
-    Args:
-        request: FastAPI Request object for template context
-
-    Returns:
-        HTMLResponse: Rendered HTML about page
-    """
+    """Serve the about page describing how the calculation works."""
     return templates.TemplateResponse(
         request=request,
         name="about.html",
@@ -105,20 +75,9 @@ async def about(request: Request):
             "app_version": config.APP_VERSION,
             "app_description": config.APP_DESCRIPTION,
             "active_page": "about",
-            "formulas": {
-                "magnus": "es = 6.112 * exp((17.67 * T) / (T + 243.5))",
-                "absolute_humidity": "AH = (e * 18.016) / (8314.5 * (T + 273.15)) * 1000",
-            },
-            "constants": {
-                "water_molecular_weight": "18.016",
-                "universal_gas_constant": "8314.5",
-                "magnus_a": "17.67",
-                "magnus_b": "243.5",
-                "magnus_c": "6.112",
-            },
             "limits": {
-                "temperature_min": "-273.15",
-                "temperature_max": "1000",
+                "temperature_min": "-100",
+                "temperature_max": "100",
                 "humidity_min": "0",
                 "humidity_max": "100",
             },
