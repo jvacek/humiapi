@@ -1,8 +1,5 @@
 """
 Configuration settings for the Absolute Humidity Calculator application.
-
-This module contains essential configuration constants and settings used
-throughout the application.
 """
 
 from pathlib import Path
@@ -10,26 +7,22 @@ from typing import Any, Dict
 
 
 class Config:
-    """Main configuration class for the application."""
+    """Application configuration."""
 
     # Application metadata
     APP_NAME = "Absolute Humidity Calculator"
     APP_VERSION = "0.1.0"
-    APP_DESCRIPTION = (
-        "A FastAPI application that calculates absolute humidity from temperature and relative humidity inputs"
-    )
+    APP_DESCRIPTION = "Calculate absolute humidity from temperature and relative humidity."
 
     # Server settings
     HOST = "0.0.0.0"
     PORT = 8000
-    DEBUG = True
     RELOAD = True
     LOG_LEVEL = "info"
 
-    # API settings
+    # API / docs URLs
     API_PREFIX = "/api"
     DOCS_URL = "/docs"
-    REDOC_URL = "/redoc"
     OPENAPI_URL = "/openapi.json"
 
     # File paths
@@ -37,24 +30,17 @@ class Config:
     TEMPLATES_DIR = BASE_DIR / "templates"
     STATIC_DIR = BASE_DIR / "static"
 
-    # Template settings
-    TEMPLATE_AUTO_RELOAD = True
-
     # Response formatting
-    DECIMAL_PLACES = 2
     DEFAULT_UNIT = "g/m³"
 
-    # CORS settings (if needed in the future)
+    # CORS
     ALLOW_ORIGINS = ["*"]
     ALLOW_METHODS = ["GET", "POST"]
     ALLOW_HEADERS = ["*"]
 
-    # Health check settings
-    HEALTH_CHECK_RESPONSE = {"status": "healthy"}
-
     @classmethod
     def get_uvicorn_config(cls) -> Dict[str, Any]:
-        """Get configuration for uvicorn server."""
+        """Get configuration for the uvicorn server."""
         return {
             "host": cls.HOST,
             "port": cls.PORT,
@@ -70,70 +56,9 @@ class Config:
             "description": cls.APP_DESCRIPTION,
             "version": cls.APP_VERSION,
             "docs_url": cls.DOCS_URL,
-            "redoc_url": cls.REDOC_URL,
+            "redoc_url": None,  # ReDoc disabled; Swagger UI at /docs covers the same schema
             "openapi_url": cls.OPENAPI_URL,
         }
 
-    @classmethod
-    def get_template_config(cls) -> Dict[str, Any]:
-        """Get configuration for Jinja2 templates."""
-        return {
-            "directory": str(cls.TEMPLATES_DIR),
-            "auto_reload": cls.TEMPLATE_AUTO_RELOAD,
-        }
 
-
-class DevelopmentConfig(Config):
-    """Configuration for development environment."""
-
-    DEBUG = True
-    RELOAD = True
-    LOG_LEVEL = "debug"
-
-
-class ProductionConfig(Config):
-    """Configuration for production environment."""
-
-    DEBUG = False
-    RELOAD = False
-    LOG_LEVEL = "warning"
-    TEMPLATE_AUTO_RELOAD = False
-
-    # More restrictive CORS in production
-    ALLOW_ORIGINS = ["https://yourdomain.com"]
-
-
-class TestingConfig(Config):
-    """Configuration for testing environment."""
-
-    DEBUG = True
-    RELOAD = False
-    LOG_LEVEL = "error"
-
-    # Use different port for testing
-    PORT = 8001
-
-
-# Default configuration
 config = Config()
-
-# Configuration mapping for different environments
-CONFIG_MAP = {
-    "development": DevelopmentConfig,
-    "production": ProductionConfig,
-    "testing": TestingConfig,
-}
-
-
-def get_config(env: str = "development") -> Config:
-    """
-    Get configuration based on environment.
-
-    Args:
-        env: Environment name (development, production, testing)
-
-    Returns:
-        Config: Configuration instance for the specified environment
-    """
-    config_class = CONFIG_MAP.get(env, Config)
-    return config_class()
