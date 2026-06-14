@@ -44,9 +44,14 @@ content %}
             Calculation Method
         </h2>
         <p class="text-gray-700 mb-4">
-            Our calculator uses the scientifically accepted Magnus formula
-            combined with the ideal gas law to provide accurate absolute
-            humidity calculations.
+            This calculator uses
+            <a
+                href="https://github.com/psychrometrics/psychrolib"
+                class="text-primary-600 hover:text-primary-800 font-medium"
+                >PsychroLib</a
+            >, an open-source library that implements the psychrometric
+            equations from the ASHRAE Handbook of Fundamentals. Calculations use
+            SI units at standard atmospheric pressure (101,325 Pa).
         </p>
 
         <h3 class="text-lg font-medium text-gray-800 mt-6 mb-4">
@@ -62,11 +67,12 @@ content %}
                     1
                 </div>
                 <div class="font-medium text-gray-800">
-                    Calculate Saturation Vapor Pressure
+                    Compute the Humidity Ratio
                 </div>
                 <p class="text-gray-600 text-sm">
-                    Using the Magnus formula to determine the maximum water
-                    vapor pressure at the given temperature.
+                    From temperature, relative humidity, and pressure, PsychroLib
+                    derives the humidity ratio (mass of water vapor per mass of
+                    dry air).
                 </p>
             </li>
             <li
@@ -78,11 +84,11 @@ content %}
                     2
                 </div>
                 <div class="font-medium text-gray-800">
-                    Determine Actual Vapor Pressure
+                    Compute Moist Air Density
                 </div>
                 <p class="text-gray-600 text-sm">
-                    Multiply saturation vapor pressure by relative humidity
-                    percentage.
+                    PsychroLib calculates the density of the moist air at the
+                    given conditions.
                 </p>
             </li>
             <li
@@ -93,137 +99,15 @@ content %}
                 >
                     3
                 </div>
-                <div class="font-medium text-gray-800">Apply Ideal Gas Law</div>
+                <div class="font-medium text-gray-800">
+                    Derive Absolute Humidity
+                </div>
                 <p class="text-gray-600 text-sm">
-                    Convert vapor pressure to absolute humidity using molecular
-                    weight and gas constants.
+                    Multiplying air density by the humidity ratio gives the mass
+                    of water vapor per cubic meter, reported in g/m³.
                 </p>
             </li>
         </ol>
-    </section>
-
-    <!-- Mathematical Formulas -->
-    <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            Mathematical Formulas
-        </h2>
-
-        <div class="bg-gray-50 rounded-lg overflow-hidden mb-6 shadow-sm">
-            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
-                <h3 class="font-medium text-gray-800">
-                    1. Saturation Vapor Pressure (Magnus Formula)
-                </h3>
-            </div>
-            <div class="p-4">
-                <div
-                    class="bg-white p-3 border-l-4 border-primary-500 font-mono text-primary-600"
-                >
-                    {{ formulas.magnus | default("es = 6.112 * exp((17.67 * T) /
-                    (T + 243.5))") }}
-                </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    Where T is temperature in Celsius, es is saturation vapor
-                    pressure in hPa
-                </p>
-            </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg overflow-hidden mb-6 shadow-sm">
-            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
-                <h3 class="font-medium text-gray-800">
-                    2. Actual Vapor Pressure
-                </h3>
-            </div>
-            <div class="p-4">
-                <div
-                    class="bg-white p-3 border-l-4 border-primary-500 font-mono text-primary-600"
-                >
-                    e = (RH / 100) × es
-                </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    Where RH is relative humidity percentage, e is actual vapor
-                    pressure in hPa
-                </p>
-            </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg overflow-hidden mb-6 shadow-sm">
-            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200">
-                <h3 class="font-medium text-gray-800">3. Absolute Humidity</h3>
-            </div>
-            <div class="p-4">
-                <div
-                    class="bg-white p-3 border-l-4 border-primary-500 font-mono text-primary-600"
-                >
-                    {{ formulas.absolute_humidity | default("AH = (e * 18.016) /
-                    (8314.5 * (T + 273.15)) * 1000") }}
-                </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    Where AH is absolute humidity in g/m³, T is temperature in
-                    Kelvin
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Physical Constants -->
-    <section>
-        <h2
-            class="text-xl md:text-2xl font-medium text-primary-600 border-b border-gray-200 pb-2 mb-4"
-        >
-            Physical Constants
-        </h2>
-        <p class="text-gray-700 mb-6">
-            The following scientifically established constants are used in our
-            calculations:
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h4 class="font-medium text-gray-800 mb-2">
-                    Water Molecular Weight
-                </h4>
-                <p class="font-mono text-primary-600 font-bold">
-                    {{ constants.water_molecular_weight | default("18.016") }}
-                    g/mol
-                </p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h4 class="font-medium text-gray-800 mb-2">
-                    Universal Gas Constant
-                </h4>
-                <p class="font-mono text-primary-600 font-bold">
-                    {{ constants.universal_gas_constant | default("8314.5") }}
-                    J/(kmol·K)
-                </p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h4 class="font-medium text-gray-800 mb-2">
-                    Magnus Constant A
-                </h4>
-                <p class="font-mono text-primary-600 font-bold">
-                    {{ constants.magnus_a | default("17.67") }}
-                </p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h4 class="font-medium text-gray-800 mb-2">
-                    Magnus Constant B
-                </h4>
-                <p class="font-mono text-primary-600 font-bold">
-                    {{ constants.magnus_b | default("243.5") }} °C
-                </p>
-            </div>
-            <div class="bg-gray-50 rounded-lg p-4 shadow-sm">
-                <h4 class="font-medium text-gray-800 mb-2">
-                    Magnus Constant C
-                </h4>
-                <p class="font-mono text-primary-600 font-bold">
-                    {{ constants.magnus_c | default("6.112") }} hPa
-                </p>
-            </div>
-        </div>
     </section>
 
     <!-- Input Limits and Validation -->
@@ -294,14 +178,11 @@ content %}
                 Results are rounded to 2 decimal places
             </li>
             <li class="px-4 py-3 text-gray-700">
-                Magnus formula accuracy: ±0.1% for temperatures between -40°C
-                and +50°C
+                Based on the ASHRAE Handbook of Fundamentals equations, as
+                implemented by PsychroLib
             </li>
             <li class="px-4 py-3 text-gray-700">
-                Overall calculation uncertainty: typically less than ±1%
-            </li>
-            <li class="px-4 py-3 text-gray-700">
-                Validated against NIST and meteorological standards
+                Calculations assume standard atmospheric pressure (101,325 Pa)
             </li>
         </ul>
     </section>
@@ -332,8 +213,7 @@ content %}
                                 >Backend:</span
                             >
                             <span class="text-gray-600">
-                                FastAPI with Python {{ app_version |
-                                default("0.1.0") }}</span
+                                FastAPI (Python 3.11+)</span
                             >
                         </div>
                     </li>
